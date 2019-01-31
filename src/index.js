@@ -22,9 +22,10 @@ class App extends React.Component {
     ]
   };
 
-  deleteTask = id => {
-    const updatedTasks = this.state.tasks.filter(t => t.id !== id);
-    this.setState({ tasks: updatedTasks });
+  deleteTask = e => {
+    const id = Math.trunc(e.target.value);
+    const deleted = this.state.tasks.filter(t => t.id != id);
+    this.setState({ tasks: deleted });
   };
 
   addTask = e => {
@@ -36,7 +37,6 @@ class App extends React.Component {
       1;
     const currenTasks = this.state.tasks;
     const updatedTasks = currenTasks.concat({ id: id, title: taskTitle });
-    console.log({ updatedTasks });
     this.setState({ tasks: updatedTasks });
   };
 
@@ -44,9 +44,8 @@ class App extends React.Component {
     const { tasks } = this.state;
     return (
       <div className="App">
-        <h1>To-do's with IndexedDB(WIP)</h1>
         <NewTask addTask={e => this.addTask(e)} />
-        <TaskList tasks={tasks} />
+        <TaskList tasks={tasks} deleteTask={this.deleteTask} />
       </div>
     );
   }
