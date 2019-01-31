@@ -63,6 +63,14 @@ class App extends React.Component {
     taskField.value = "";
   };
 
+  editTask = e => {
+    const taskId = Math.trunc(e.currentTarget.id);
+    const newValue = e.target.value;
+    const tasks = this.state.tasks;
+    tasks.find(t => t.id === taskId).title = newValue;
+    this.setState({ tasks });
+  };
+
   changeStatus = e => {
     const currentTasks = this.state.tasks;
     const taskToUpdate = currentTasks.find(
@@ -88,6 +96,7 @@ class App extends React.Component {
           deleteTask={this.deleteTask}
           changeStatus={this.changeStatus}
           showOnlyIncomplete={showOnlyIncomplete}
+          editTask={e => this.editTask(e)}
         />
         <ToggleCompleted
           handleChange={this.toggleShowOnlyIncomplete}

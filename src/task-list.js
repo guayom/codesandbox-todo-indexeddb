@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import ContentEditable from "react-contenteditable";
 
 const Container = styled.ul`
   flex: 1;
@@ -34,7 +35,13 @@ const Options = styled.div`
   }
 `;
 
-export default ({ tasks, deleteTask, changeStatus, showOnlyIncomplete }) => {
+export default ({
+  tasks,
+  deleteTask,
+  changeStatus,
+  showOnlyIncomplete,
+  editTask
+}) => {
   return (
     <Container>
       {tasks.map(task => (
@@ -43,14 +50,19 @@ export default ({ tasks, deleteTask, changeStatus, showOnlyIncomplete }) => {
           done={task.done}
           show={showOnlyIncomplete && task.done ? false : true}
         >
+          <input
+            type="checkbox"
+            checked={task.done}
+            data-id={task.id}
+            onChange={changeStatus}
+          />
           <ItemTitle>
-            <input
-              type="checkbox"
-              checked={task.done}
-              data-id={task.id}
-              onChange={changeStatus}
+            <ContentEditable
+              html={task.title}
+              id={task.id}
+              onChange={e => editTask(e)}
+              disabled={task.done}
             />
-            {task.title}
           </ItemTitle>
           <Options>
             <button onClick={deleteTask} value={task.id}>
