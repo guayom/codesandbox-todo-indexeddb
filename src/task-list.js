@@ -2,14 +2,16 @@ import React from "react";
 import styled from "styled-components";
 
 const Container = styled.ul`
+  flex: 1;
   display: block;
   padding: 0;
   margin: 0;
   list-style: none;
+  overflow: scroll;
 `;
 
 const Item = styled.li`
-  display: flex;
+  display: ${props => (props.show ? "flex" : "none")};
   margin: 0;
   padding: 8px;
   border-bottom: 1px solid #ddd;
@@ -32,11 +34,15 @@ const Options = styled.div`
   }
 `;
 
-export default ({ tasks, deleteTask, changeStatus }) => {
+export default ({ tasks, deleteTask, changeStatus, showOnlyIncomplete }) => {
   return (
     <Container>
       {tasks.map(task => (
-        <Item key={task.id} done={task.done}>
+        <Item
+          key={task.id}
+          done={task.done}
+          show={showOnlyIncomplete && task.done ? false : true}
+        >
           <ItemTitle>
             <input
               type="checkbox"

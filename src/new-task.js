@@ -5,6 +5,8 @@ const Container = styled.form`
   background: lightblue;
   padding: 10px;
   display: flex;
+  flex: none;
+  height: auto;
 `;
 
 const SearchInput = styled.input`

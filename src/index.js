@@ -2,11 +2,16 @@ import React from "react";
 import ReactDOM from "react-dom";
 import TaskList from "./task-list";
 import NewTask from "./new-task";
+import ToggleCompleted from "./toggle-completed";
 
 import "./styles.css";
 
+const originalShowOnlyIncomplete =
+  JSON.parse(localStorage.getItem("__showOnlyIncomplete")) || false;
+
 class App extends React.Component {
   state = {
+    showOnlyIncomplete: originalShowOnlyIncomplete,
     tasks: [
       {
         id: 1,
@@ -16,12 +21,12 @@ class App extends React.Component {
       {
         id: 2,
         title: "Make pancackes",
-        done: false
+        done: true
       },
       {
         id: 3,
         title: "Do the laundry",
-        done: false
+        done: true
       },
       {
         id: 4,
@@ -63,8 +68,14 @@ class App extends React.Component {
     this.setState({ tasks: currentTasks });
   };
 
+  toggleShowOnlyIncomplete = () => {
+    const newState = !this.state.showOnlyIncomplete;
+    localStorage.setItem("__showOnlyIncomplete", newState);
+    this.setState({ showOnlyIncomplete: newState });
+  };
+
   render() {
-    const { tasks } = this.state;
+    const { tasks, showOnlyIncomplete } = this.state;
     return (
       <div className="App">
         <NewTask addTask={e => this.addTask(e)} />
@@ -72,6 +83,11 @@ class App extends React.Component {
           tasks={tasks}
           deleteTask={this.deleteTask}
           changeStatus={this.changeStatus}
+          showOnlyIncomplete={showOnlyIncomplete}
+        />
+        <ToggleCompleted
+          handleChange={this.toggleShowOnlyIncomplete}
+          checked={showOnlyIncomplete}
         />
       </div>
     );
