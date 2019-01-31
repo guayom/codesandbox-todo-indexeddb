@@ -46,7 +46,7 @@ export default ({ tasks, deleteTask, changeStatus, showOnlyIncomplete }) => {
           <ItemTitle>
             <input
               type="checkbox"
-              value={task.done}
+              checked={task.done}
               data-id={task.id}
               onClick={changeStatus}
             />
