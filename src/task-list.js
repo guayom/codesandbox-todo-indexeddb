@@ -48,7 +48,7 @@ export default ({ tasks, deleteTask, changeStatus, showOnlyIncomplete }) => {
               type="checkbox"
               checked={task.done}
               data-id={task.id}
-              onClick={changeStatus}
+              onChange={changeStatus}
             />
             {task.title}
           </ItemTitle>

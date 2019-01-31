@@ -54,7 +54,11 @@ class App extends React.Component {
     const currentTasks = this.state.tasks;
     const id =
       currentTasks.map(t => t.id).reduce((max, n) => (n > max ? n : max)) + 1;
-    const updatedTasks = currentTasks.concat({ id: id, title: taskTitle });
+    const updatedTasks = currentTasks.concat({
+      id: id,
+      title: taskTitle,
+      done: false
+    });
     this.setState({ tasks: updatedTasks });
     taskField.value = "";
   };
