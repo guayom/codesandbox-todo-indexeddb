@@ -8,17 +8,31 @@ import "./styles.css";
 class App extends React.Component {
   state = {
     tasks: [
-      { id: 1, title: "Take out the trash" },
+      {
+        id: 1,
+        title: "Take out the trash",
+        done: false
+      },
       {
         id: 2,
-        title: "Make pancackes"
+        title: "Make pancackes",
+        done: false
       },
-      { id: 3, title: "Do the laundry" },
+      {
+        id: 3,
+        title: "Do the laundry",
+        done: false
+      },
       {
         id: 4,
-        title: "Read about react hooks"
+        title: "Read about react hooks",
+        done: false
       },
-      { id: 5, title: "Rewrite this app with hooks" }
+      {
+        id: 5,
+        title: "Rewrite this app with hooks",
+        done: false
+      }
     ]
   };
 
@@ -30,14 +44,23 @@ class App extends React.Component {
 
   addTask = e => {
     e.preventDefault();
-    const taskTitle = e.target.task.value;
-    e.target.task.value = "";
+    const taskField = e.target.task;
+    const taskTitle = taskField.value;
+    const currentTasks = this.state.tasks;
     const id =
-      this.state.tasks.map(t => t.id).reduce((max, n) => (n > max ? n : max)) +
-      1;
-    const currenTasks = this.state.tasks;
-    const updatedTasks = currenTasks.concat({ id: id, title: taskTitle });
+      currentTasks.map(t => t.id).reduce((max, n) => (n > max ? n : max)) + 1;
+    const updatedTasks = currentTasks.concat({ id: id, title: taskTitle });
     this.setState({ tasks: updatedTasks });
+    taskField.value = "";
+  };
+
+  changeStatus = e => {
+    const currentTasks = this.state.tasks;
+    const taskToUpdate = currentTasks.find(
+      t => t.id === Math.trunc(e.target.dataset.id)
+    );
+    taskToUpdate.done = !taskToUpdate.done;
+    this.setState({ tasks: currentTasks });
   };
 
   render() {
@@ -45,7 +68,11 @@ class App extends React.Component {
     return (
       <div className="App">
         <NewTask addTask={e => this.addTask(e)} />
-        <TaskList tasks={tasks} deleteTask={this.deleteTask} />
+        <TaskList
+          tasks={tasks}
+          deleteTask={this.deleteTask}
+          changeStatus={this.changeStatus}
+        />
       </div>
     );
   }
