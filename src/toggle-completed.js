@@ -13,7 +13,7 @@ export default ({ handleChange, checked }) => {
   return (
     <Container>
       <input type="checkbox" onChange={handleChange} checked={checked} />
-      Show only incomplete tasks
+      Hide finished tasks
     </Container>
   );
 };
