@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import TaskList from "./task-list";
 import NewTask from "./new-task";
+import NoTasks from "./no-tasks";
 import ToggleCompleted from "./toggle-completed";
 import { openDb, deleteDb } from "idb";
 
@@ -120,13 +121,17 @@ class App extends React.Component {
     return (
       <div className="App">
         <NewTask addTask={e => this.addTask(e)} />
-        <TaskList
-          tasks={tasks}
-          deleteTask={this.deleteTask}
-          changeStatus={this.changeStatus}
-          showOnlyIncomplete={showOnlyIncomplete}
-          editTask={e => this.editTask(e)}
-        />
+        {tasks.length > 0 ? (
+          <TaskList
+            tasks={tasks}
+            deleteTask={this.deleteTask}
+            changeStatus={this.changeStatus}
+            showOnlyIncomplete={showOnlyIncomplete}
+            editTask={e => this.editTask(e)}
+          />
+        ) : (
+          <NoTasks />
+        )}
         <ToggleCompleted
           handleChange={this.toggleShowOnlyIncomplete}
           checked={showOnlyIncomplete}
