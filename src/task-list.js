@@ -52,6 +52,7 @@ export default ({
         >
           <input
             type="checkbox"
+            name="markCompleted"
             checked={task.done}
             data-id={task.id}
             onChange={changeStatus}

@@ -3,87 +3,116 @@ import ReactDOM from "react-dom";
 import TaskList from "./task-list";
 import NewTask from "./new-task";
 import ToggleCompleted from "./toggle-completed";
+import { openDb, deleteDb } from "idb";
 
 import "./styles.css";
 
 const originalShowOnlyIncomplete =
   JSON.parse(localStorage.getItem("__showOnlyIncomplete")) || false;
 
+const dbPromise = openDb("TASKS-DB", 1, upgradeDB => {
+  upgradeDB.createObjectStore("tasks", {
+    keyPath: "id",
+    autoIncrement: true
+  });
+});
+
 class App extends React.Component {
   state = {
     showOnlyIncomplete: originalShowOnlyIncomplete,
-    tasks: [
-      {
-        id: 1,
-        title: "Take out the trash",
-        done: false
-      },
-      {
-        id: 2,
-        title: "Make pancackes",
-        done: true
-      },
-      {
-        id: 3,
-        title: "Do the laundry",
-        done: true
-      },
-      {
-        id: 4,
-        title: "Read about react hooks",
-        done: false
-      },
-      {
-        id: 5,
-        title: "Rewrite this app with hooks",
-        done: false
-      }
-    ]
+    tasks: []
   };
 
   deleteTask = e => {
     const id = Math.trunc(e.target.value);
-    const deleted = this.state.tasks.filter(t => t.id != id);
-    this.setState({ tasks: deleted });
+    dbPromise
+      .then(db => {
+        const tx = db.transaction("tasks", "readwrite");
+        tx.objectStore("tasks").delete(id);
+        return tx.complete;
+      })
+      .then(this.getTasksToState());
   };
 
   addTask = e => {
     e.preventDefault();
     const taskField = e.target.task;
     const taskTitle = taskField.value;
-    const currentTasks = this.state.tasks;
-    const id =
-      currentTasks.map(t => t.id).reduce((max, n) => (n > max ? n : max)) + 1;
-    const updatedTasks = currentTasks.concat({
-      id: id,
-      title: taskTitle,
-      done: false
-    });
-    this.setState({ tasks: updatedTasks });
     taskField.value = "";
+    dbPromise
+      .then(db => {
+        const tx = db.transaction("tasks", "readwrite");
+        tx.objectStore("tasks").put({
+          title: taskTitle,
+          done: false
+        });
+        return tx.complete;
+      })
+      .then(this.getTasksToState());
   };
 
   editTask = e => {
     const taskId = Math.trunc(e.currentTarget.id);
-    const newValue = e.target.value;
-    const tasks = this.state.tasks;
-    tasks.find(t => t.id === taskId).title = newValue;
-    this.setState({ tasks });
+    const newTitle = e.target.value;
+
+    dbPromise
+      .then(db => {
+        return db
+          .transaction("tasks")
+          .objectStore("tasks")
+          .get(taskId);
+      })
+      .then(obj => {
+        obj.title = newTitle;
+        this.updateTask(obj);
+      });
+  };
+
+  updateTask = task => {
+    dbPromise
+      .then(db => {
+        const tx = db.transaction("tasks", "readwrite");
+        tx.objectStore("tasks").put(task);
+        return tx.complete;
+      })
+      .then(this.getTasksToState());
   };
 
   changeStatus = e => {
-    const currentTasks = this.state.tasks;
-    const taskToUpdate = currentTasks.find(
-      t => t.id === Math.trunc(e.target.dataset.id)
-    );
-    taskToUpdate.done = !taskToUpdate.done;
-    this.setState({ tasks: currentTasks });
+    const value = e.target.checked;
+    const id = Math.trunc(e.target.dataset.id);
+    dbPromise
+      .then(db => {
+        return db
+          .transaction("tasks")
+          .objectStore("tasks")
+          .get(id);
+      })
+      .then(obj => {
+        obj.done = value;
+        this.updateTask(obj);
+      });
   };
 
   toggleShowOnlyIncomplete = () => {
     const newState = !this.state.showOnlyIncomplete;
     localStorage.setItem("__showOnlyIncomplete", newState);
     this.setState({ showOnlyIncomplete: newState });
+  };
+
+  getTasksToState = () => {
+    dbPromise
+      .then(db => {
+        return db
+          .transaction("tasks")
+          .objectStore("tasks")
+          .getAll();
+      })
+      .then(tasks => this.setState({ tasks }));
+  };
+
+  componentDidMount = () => {
+    this.getTasksToState();
   };
 
   render() {
